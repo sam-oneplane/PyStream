@@ -1,0 +1,57 @@
+version: '3.8'
+
+services:
+  # CPU Version - Basic setup
+  yolo-tracker-cpu:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: yolo-tracker-cpu
+    volumes:
+      # Mount video files
+      - ./videos:/app/videos
+      # Mount output directory
+      - ./output:/app/output
+      # Mount X11 socket for display
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+    environment:
+      - DISPLAY=${DISPLAY}
+      - QT_X11_NO_MITSHM=1
+    network_mode: host
+    stdin_open: true
+    tty: true
+    command: python yolo_tracker.py /app/videos/video.mp4
+
+  # GPU Version - Requires nvidia-docker
+  yolo-tracker-gpu:
+    build:
+      context: .
+      dockerfile: Dockerfile.gpu
+    container_name: yolo-tracker-gpu
+    runtime: nvidia
+    volumes:
+      - ./videos:/app/videos
+      - ./output:/app/output
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+    environment:
+      - DISPLAY=${DISPLAY}
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=compute,utility,video
+      - QT_X11_NO_MITSHM=1
+    network_mode: host
+    stdin_open: true
+    tty: true
+    command: python yolo_tracker.py /app/videos/video.mp4
+
+  # Headless version - No display, save output to video
+  yolo-tracker-headless:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: yolo-tracker-headless
+    volumes:
+      - ./videos:/app/videos
+      - ./output:/app/output
+    environment:
+      - HEADLESS=1
+    command: python yolo_tracker_headless.py /app/videos/video.mp4 /app/output/output.mp4
