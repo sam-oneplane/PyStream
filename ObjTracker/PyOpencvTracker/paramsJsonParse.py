@@ -41,7 +41,7 @@ class TrackerParams:
 
 if __name__ == "__main__":
 
-    jsonPath = os.path.join('/','home','avivi','Developer','Python','OpenCV','video','samples_params.json')
+    jsonPath = os.path.join('/','tmp','samples_params.json')
     trcParams = TrackerParams()
     trcParams.parse(jsonPath)
     key = 'highway_1.mp4'

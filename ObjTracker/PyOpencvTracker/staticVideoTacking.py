@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 from tracker import Tracker
 from paramsJsonParse import TrackerParams
 
-jsonPath = os.path.join('/','home','avivi','Developer','Python','OpenCV','video','samples_params.json')
+jsonPath = os.path.join('/','tmp','samples_params.json')
 
 trckerParams = TrackerParams()
 trckerParams.parse(jsonPath)

@@ -1,0 +1,26 @@
+{
+    "path": "/tmp/Samples",
+    "samples" : [
+        {
+            "name" : "highway_1.mp4",
+            "parameters": {
+                "DetectorThd": 40,
+                "FrameRoi": "340, 700, 550, 800",
+                "CountoursArea": 150,
+                "BoxYOffset": 3,
+                "MaxEucDist": 25
+            }
+        },
+        {
+            "name" : "highway_2.mp4",
+            "parameters": {
+                "DetectorThd": 50,
+                "FrameRoi": "150, 720, 400, 1000",
+                "CountoursArea": 1000,
+                "BoxYOffset": 3,
+                "MaxEucDist": 35
+            }
+        }
+    ]
+
+}
