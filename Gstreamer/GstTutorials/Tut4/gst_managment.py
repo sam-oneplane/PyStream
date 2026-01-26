@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+
 import logging
 import sys
 
@@ -12,8 +12,8 @@ logging.basicConfig(level=logging.DEBUG, format="[%(name)s] [%(levelname)8s] - %
 logger = logging.getLogger(__name__)
 
 
-class Tutorial4:
-    def __init__(self):
+class GstManager:
+    def __init__(self, args):
         self.playing = False
         self.terminate = False
         self.seek_enabled = False
@@ -21,11 +21,12 @@ class Tutorial4:
         self.duration = Gst.CLOCK_TIME_NONE
 
         # Initialize GStreamer
-        Gst.init(sys.argv[1:])
-
-        # Create the plybin pipeline
+        Gst.init(args)
         self.playbin = Gst.ElementFactory.make("playbin", "playbin")
 
+    def __call__(self):
+        # Create the plybin element
+    
         if not self.playbin:
             logger.error("Not all elements could be created.")
             sys.exit(1)
@@ -48,14 +49,15 @@ class Tutorial4:
 
             # Parse message
             if msg:
-                self.handle_message(msg)
+                self._handle_message(msg)
             else:
-                self.handle_query()
+                self._handle_query()
                 
         self.playbin.set_state(Gst.State.NULL)
+        return 0
         
 
-    def handle_message(self, msg: Gst.Message):
+    def _handle_message(self, msg: Gst.Message):
         if msg.type == Gst.MessageType.ERROR:
             err, debug_info = msg.parse_error()
             logger.error(f"Error received from element {msg.src.get_name()}: {err.message}")
@@ -89,7 +91,7 @@ class Tutorial4:
             logger.error("Unexpected message received.")
             
             
-    def handle_query(self) :
+    def _handle_query(self) :
         
         if self.playing:
             current = -1
@@ -116,5 +118,16 @@ class Tutorial4:
                 self.seek_done = True
 
 
+def main_wrapper(_, argv):
+    """Wrapper function for gst_macos_main"""
+    gst_manager = GstManager(argv[1:])
+    return gst_manager()
+
 if __name__ == "__main__":
-    Tutorial4()
+    # Use gst_macos_main on macOS
+    import platform
+    if platform.system() == 'Darwin':
+        sys.exit(Gst.macos_main(main_wrapper, sys.argv))
+    else:
+        gst_concepts = GstManager(sys.argv[1:])
+        sys.exit(gst_concepts())

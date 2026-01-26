@@ -18,3 +18,5 @@ gst-launch-1.0 videotestsrc ! videoconvert ! autovideosink
 
 # Check what autovideosink actually chooses
 gst-launch-1.0 -v videotestsrc ! autovideosink
+# Check gst-launch-1.0 with mac local camera
+gst-launch-1.0 avfvideosrc ! osxvideosink

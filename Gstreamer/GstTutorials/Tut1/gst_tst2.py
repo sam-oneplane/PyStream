@@ -11,23 +11,40 @@ pipeline = None
 bus = None
 message = None
 
-# initialize GStreamer
-Gst.init(sys.argv[1:])
+class GstHello:
+    def __init__(self, args) :
+        # initialize GStreamer
+        Gst.init(args)
+        # build the pipeline
+        self.pipeline = Gst.parse_launch(
+            "playbin uri=https://gstreamer.freedesktop.org/data/media/sintel_trailer-480p.webm"
+        )
 
-# build the pipeline
-pipeline = Gst.parse_launch(
-    "playbin uri=https://gstreamer.freedesktop.org/data/media/sintel_trailer-480p.webm"
-)
+    def __call__(self):
+        # start playing
+        self.pipeline.set_state(Gst.State.PLAYING)        
+        # wait until EOS or error
+        bus = self.pipeline.get_bus()
+        msg = bus.timed_pop_filtered(
+            Gst.CLOCK_TIME_NONE,
+            Gst.MessageType.ERROR | Gst.MessageType.EOS
+        )
 
-# start playing
-pipeline.set_state(Gst.State.PLAYING)
+        # free resources
+        self.pipeline.set_state(Gst.State.NULL)
 
-# wait until EOS or error
-bus = pipeline.get_bus()
-msg = bus.timed_pop_filtered(
-    Gst.CLOCK_TIME_NONE,
-    Gst.MessageType.ERROR | Gst.MessageType.EOS
-)
 
-# free resources
-pipeline.set_state(Gst.State.NULL)
+def main_wrapper(_, argv):
+    """Wrapper function for gst_macos_main"""
+    gst_hello = GstHello(argv[1:])
+    return gst_hello()
+
+if __name__ == "__main__":
+    # Use gst_macos_main on macOS
+    import platform
+    if platform.system() == 'Darwin':
+        sys.exit(Gst.macos_main(main_wrapper, sys.argv))
+    else:
+        gst_hello = GstHello(sys.argv[1:])
+        sys.exit(gst_hello())
+        
